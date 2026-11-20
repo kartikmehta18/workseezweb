@@ -2,24 +2,22 @@
 
 import { useState, type ComponentType } from "react";
 import Image, { type StaticImageData } from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import visualeezShot from "@/public/visualeez.png";
 import portalShot from "@/public/portal.png";
 import {
   ArrowRight,
   ArrowUpRight,
-  Bot,
   ChartColumn,
   ChevronDown,
   Clapperboard,
   CodeXml,
-  ImageIcon,
   LayoutDashboard,
   Megaphone,
   Menu,
   PenLine,
   Share2,
-  Target,
   X,
 } from "lucide-react";
 
@@ -37,7 +35,7 @@ const accentBg: Record<Accent, string> = {
 
 type IconType = ComponentType<{ className?: string }>;
 
-type PanelId = "products" | "services" | "solutions";
+type PanelId = "products" | "solutions";
 
 type NavItem = {
   label: string;
@@ -68,12 +66,13 @@ type MenuPanel = {
 const PORTAL_URL = "https://portal.workseez.com/";
 const VISUALEEZ_URL = "https://visualeez.com";
 
+// Paths start with "/" so they also work from other pages (e.g. /contact).
 const navItems: NavItem[] = [
+  { label: "Home", href: "/" },
   { label: "Products", panelId: "products" },
-  { label: "Services", panelId: "services" },
-  { label: "Solutions", panelId: "solutions" },
-  { label: "About", href: "#about" },
-  // { label: "Contact", href: "#contact" },
+  { label: "Work", href: "/#results" },
+  { label: "Services", panelId: "solutions" },
+  { label: "About", href: "/#comparison" },
 ];
 
 const menuPanels: MenuPanel[] = [
@@ -86,24 +85,15 @@ const menuPanels: MenuPanel[] = [
     ],
   },
   {
-    id: "services",
-    height: 232,
-    items: [
-      { title: "Posts", description: "Posts and carousels designed for your social pages.", href: "#services", icon: ImageIcon, accent: "red" },
-      { title: "Video Editing", description: "Reels, ads and YouTube videos, edited and ready to post.", href: "#services", icon: Clapperboard, accent: "blue" },
-      { title: "Lead Generation", description: "Campaigns that bring in enquiries from real customers.", href: "#services", icon: Target, accent: "green" },
-    ],
-  },
-  {
     id: "solutions",
     height: 250,
     items: [
-      { title: "Digital Marketing", description: "Ads, SEO and campaigns", href: "#solutions", icon: Megaphone, accent: "red" },
-      { title: "Web & Software Dev", description: "Websites, apps and software", href: "#solutions", icon: CodeXml, accent: "blue" },
-      { title: "Video Editing", description: "Reels, ads and YouTube", href: "#solutions", icon: Clapperboard, accent: "green" },
-      { title: "AI Automation", description: "Automate repetitive work", href: "#solutions", icon: Bot, accent: "magenta" },
-      { title: "Content Creation", description: "Writing, design and scripts", href: "#solutions", icon: PenLine, accent: "red" },
-      { title: "Social Media", description: "Page management and posting", href: "#solutions", icon: Share2, accent: "blue" },
+      // All open the Services section on the home page.
+      { title: "Digital Marketing", description: "Ads, SEO and campaigns", href: "/#services", icon: Megaphone, accent: "red" },
+      { title: "Web & Software Dev", description: "Websites, apps and software", href: "/#services", icon: CodeXml, accent: "blue" },
+      { title: "Video Editing", description: "Reels, ads and YouTube", href: "/#services", icon: Clapperboard, accent: "green" },
+      { title: "Content Creation", description: "Writing, design and scripts", href: "/#services", icon: PenLine, accent: "red" },
+      { title: "Social Media", description: "Page management and posting", href: "/#services", icon: Share2, accent: "blue" },
     ],
   },
 ];
@@ -219,10 +209,10 @@ export default function NavbarTwo() {
     <div className="relative z-40 flex w-full select-none flex-col items-center px-6 pt-0 font-sans text-zinc-900">
       {/* Desktop */}
       <div className="relative z-30 hidden h-12 w-full max-w-7xl items-center justify-between lg:flex">
-        <a href="#" className="flex items-center" aria-label="Workseez home">
+        <Link href="/" className="flex items-center" aria-label="Workseez home">
           <span className="xl:hidden"><WorkseezLogo /></span>
           <span className="hidden xl:inline"><WorkseezLogo showWordmark /></span>
-        </a>
+        </Link>
 
         <div className="absolute left-1/2 top-0 hidden w-[700px] -translate-x-1/2 lg:block" style={{ filter: "drop-shadow(0 10px 16px rgba(6, 17, 40, 0.16))" }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="pointer-events-none absolute -left-[18px] top-0 z-10 text-brand-navy"><path d="M 20 20 L 20 0 L 0 0 C 11.046 0 20 11.046 20 20 Z" fill="currentColor" /></svg>
@@ -235,26 +225,28 @@ export default function NavbarTwo() {
                   <button key={item.label} type="button" aria-expanded={activeMenu === item.panelId} onClick={() => toggleMenu(item.panelId!)} className={`flex cursor-pointer items-center gap-1 rounded-md px-3 py-1 outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/30 ${activeMenu === item.panelId ? "bg-brand-navy-light text-white" : "text-slate-300"}`}>
                     {item.label}<ChevronDown className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${activeMenu === item.panelId ? "rotate-180" : ""}`} />
                   </button>
-                ) : <a key={item.label} href={item.href} className="px-2 py-1 text-slate-300 transition-colors hover:text-white">{item.label}</a>)}
+                ) : <Link key={item.label} href={item.href ?? "/"} onClick={() => setActiveMenu(null)} className="px-2 py-1 text-slate-300 transition-colors hover:text-white">{item.label}</Link>)}
               </nav>
             </div>
 
             <AnimatePresence mode="wait">
               {activePanel && (
                 <motion.div key={activePanel.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden border-t border-brand-navy-line bg-brand-navy">
-                  <DropdownPanel panel={activePanel} />
+                  <div onClick={(e) => (e.target as HTMLElement).closest("a") && setActiveMenu(null)}>
+                    <DropdownPanel panel={activePanel} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
         </div>
 
-        <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-lg bg-brand-navy px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-brand-navy-light">Contact<ArrowUpRight className="h-3.5 w-3.5" /></a>
+        <Link href="/contact" className="flex items-center gap-1 rounded-lg bg-brand-navy px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-brand-navy-light">Contact<ArrowUpRight className="h-3.5 w-3.5" /></Link>
       </div>
 
       {/* Mobile */}
       <div className="relative z-30 flex h-14 w-full items-center justify-between lg:hidden">
-        <a href="#" aria-label="Workseez home"><WorkseezLogo showWordmark /></a>
+        <Link href="/" aria-label="Workseez home"><WorkseezLogo showWordmark /></Link>
         <div className="flex items-center gap-2">
           <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-1 rounded-lg bg-brand-navy px-3 py-1.5 text-xs font-medium text-white sm:flex">Client Portal<ArrowUpRight className="h-3 w-3" /></a>
           <button type="button" aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} onClick={() => setMobileOpen((open) => !open)} className="grid size-9 place-items-center rounded-lg border border-zinc-200 text-brand-navy">{mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}</button>
@@ -270,7 +262,7 @@ export default function NavbarTwo() {
                 const isOpen = mobileActiveMenu === item.panelId;
 
                 if (!item.panelId) {
-                  return <a key={item.label} href={item.href || "#"} className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white">{item.label}</a>;
+                  return <Link key={item.label} href={item.href ?? "/"} onClick={() => setMobileOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white">{item.label}</Link>;
                 }
 
                 return (
@@ -284,7 +276,7 @@ export default function NavbarTwo() {
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
                           <div className="mx-3 mb-2 grid gap-1 border-l border-white/10 pl-3 pt-1">
                             {panel.items.map((panelItem) => (
-                              <a key={panelItem.title} {...linkProps(panelItem)} className={`flex gap-3 rounded-md px-3 py-2 hover:bg-white/5 ${panelItem.image ? "items-center" : "items-start"}`}>
+                              <a key={panelItem.title} {...linkProps(panelItem)} onClick={() => setMobileOpen(false)} className={`flex gap-3 rounded-md px-3 py-2 hover:bg-white/5 ${panelItem.image ? "items-center" : "items-start"}`}>
                                 {panelItem.image ? (
                                   <span className="relative h-10 w-[72px] shrink-0 overflow-hidden rounded bg-white ring-1 ring-white/10">
                                     <Image src={panelItem.image} alt="" fill sizes="72px" placeholder="blur" className="object-cover object-top" />
@@ -308,7 +300,8 @@ export default function NavbarTwo() {
                   </div>
                 );
               })}
-              <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-white px-3 py-2 text-sm font-medium text-brand-navy sm:hidden">Client Portal<ArrowUpRight className="size-3.5" /></a>
+              <Link href="/contact" onClick={() => setMobileOpen(false)} className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-brand-navy">Contact / Book a call<ArrowUpRight className="size-3.5" /></Link>
+              <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 rounded-lg border border-white/20 px-3 py-2 text-sm font-medium text-white sm:hidden">Client Portal<ArrowUpRight className="size-3.5" /></a>
             </div>
           </motion.div>
         )}

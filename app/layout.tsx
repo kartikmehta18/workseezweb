@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import SmoothScroll from "@/components/smooth-scroll";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,10 +18,6 @@ const openSauce = localFont({
   variable: "--font-open-sauce",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Workseez - One Step Solution For Your Business",
@@ -32,10 +29,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${openSauce.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${openSauce.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <SmoothScroll>{children}</SmoothScroll>
         {/* Frosted fade fixed to the bottom of the screen on every page. */}
         <div aria-hidden className="pointer-events-none fixed inset-x-0 bottom-0 z-50 h-18 backdrop-blur-sm mask-t-from-30%" />
       </body>

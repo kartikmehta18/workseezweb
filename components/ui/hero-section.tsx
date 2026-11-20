@@ -14,11 +14,10 @@ import Image from "next/image";
 import visualeezShot from "@/public/visualeez.png";
 import { useReducedMotion } from "motion/react";
 import { ArrowUpRight, Forward, Heart, MessageCircle } from "lucide-react";
+import BookCallButton from "@/components/ui/book-call-button";
+import { SlideMedia, slides, type Slide } from "@/components/ui/slide-media";
 
 /* Brand colours live in app/globals.css (bg-brand-navy = #061128, …). */
-
-/** Animated post samples (1080×1350) in public/heroslide. */
-const slide = (file: string) => `/heroslide/${encodeURIComponent(file)}`;
 
 /** 5140000 → "5.1M", 612000 → "612K". */
 function compact(n: number) {
@@ -30,7 +29,7 @@ function compact(n: number) {
 type Post = {
   handle: string;
   platform: string;
-  src: string;
+  slide: Slide;
   caption: string;
   tags: string;
   views: number;
@@ -41,17 +40,17 @@ type Post = {
 
 // Sample work. Swap the numbers for real campaign results when you have them.
 const posts: Post[] = [
-  { handle: "workseez", platform: "LinkedIn", src: slide("AI_Agent_vs_Agentic_AI_Cartoon_1080x1350_light (v1).gif"), caption: "AI agent vs agentic AI, explained in one cartoon", tags: "#ai #agents", views: 2_410_000, likes: 318_000, comments: 3_100, shares: 12_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_Panjuta_10_MCP_Concepts_1080x1350.gif"), caption: "10 MCP concepts every AI builder should know", tags: "#mcp #aitools", views: 5_140_000, likes: 612_000, comments: 8_400, shares: 41_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_AgenticAIGovernance_Animated_1080x1350.gif"), caption: "Deploying AI agents safely: the terms to know", tags: "#aigovernance #agenticai", views: 3_620_000, likes: 441_000, comments: 5_200, shares: 26_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_Panjuta_Claude_Code_Agent_Repos_1080x1350.gif"), caption: "10 best AI agent repositories for Claude Code", tags: "#claudecode #github", views: 4_230_000, likes: 530_000, comments: 7_700, shares: 33_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_Panjuta_How_AI_Chatbot_Is_Made_Animated_1080x1350.gif"), caption: "How an AI chatbot is made, start to finish", tags: "#llm #chatbots", views: 1_840_000, likes: 204_000, comments: 2_600, shares: 9_100 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.aiAgents, caption: "AI agent vs agentic AI, explained in one cartoon", tags: "#ai #agents", views: 2_410_000, likes: 318_000, comments: 3_100, shares: 12_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.mcp, caption: "10 MCP concepts every AI builder should know", tags: "#mcp #aitools", views: 5_140_000, likes: 612_000, comments: 8_400, shares: 41_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.governance, caption: "Deploying AI agents safely: the terms to know", tags: "#aigovernance #agenticai", views: 3_620_000, likes: 441_000, comments: 5_200, shares: 26_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.repos, caption: "10 best AI agent repositories for Claude Code", tags: "#claudecode #github", views: 4_230_000, likes: 530_000, comments: 7_700, shares: 33_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.chatbot, caption: "How an AI chatbot is made, start to finish", tags: "#llm #chatbots", views: 1_840_000, likes: 204_000, comments: 2_600, shares: 9_100 },
 ];
 
-type Tile = { src: string; label: string };
+type Tile = { slide: Slide; label: string };
 
 const tileLabels = ["ai.agents", "mcp.concepts", "ai.governance", "claude.code", "ai.chatbots", "agentic.ai", "ai.tools", "llm.basics"];
-const initialTiles: Tile[] = tileLabels.map((label, i) => ({ src: posts[i % posts.length].src, label }));
+const initialTiles: Tile[] = tileLabels.map((label, i) => ({ slide: posts[i % posts.length].slide, label }));
 
 /* ------------------------------ Motion constants ------------------------------ */
 
@@ -136,16 +135,8 @@ function PostCard({
         boxShadow: `0 ${30 * K}px ${60 * K}px -${28 * K}px rgba(6,17,40,.55), 0 ${10 * K}px ${22 * K}px -${12 * K}px rgba(0,0,0,.35)`,
       }}
     >
-      <Image
-        src={post.src}
-        alt={post.caption}
-        fill
-        sizes={`${CARD_W}px`}
-        unoptimized
-        loading="eager"
-        draggable={false}
-        className="pointer-events-none select-none object-contain object-[50%_45%]"
-      />
+      {/* Only the front card plays video; cards behind it and the flying card show the still. */}
+      <SlideMedia slide={post.slide} alt={post.caption} play={active} sizes={`${CARD_W}px`} fit="object-contain object-[50%_45%]" priority={active} />
       <div ref={uiRef} className="absolute inset-0 text-white">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.38)_0%,rgba(0,0,0,0)_22%,rgba(0,0,0,0)_50%,rgba(0,0,0,.74)_100%)]" />
 
@@ -340,7 +331,7 @@ function SwipeStage({ className }: { className: string }) {
   );
 
   const land = useCallback((f: Flyer) => {
-    setTiles((list) => list.map((t, i) => (i === f.tile ? { src: f.post.src, label: f.post.handle } : t)));
+    setTiles((list) => list.map((t, i) => (i === f.tile ? { slide: f.post.slide, label: f.post.handle } : t)));
     setFlyers((list) => list.filter((x) => x.id !== f.id));
   }, []);
 
@@ -396,7 +387,7 @@ function SwipeStage({ className }: { className: string }) {
               className="relative flex-none overflow-hidden rounded-[22px] bg-white ring-1 ring-slate-200"
               style={{ width: TILE_W, height: TILE_H }}
             >
-              <Image src={tile.src} alt={copy === 0 ? `@${tile.label}` : ""} fill sizes={`${TILE_W}px`} unoptimized className="object-contain object-top" />
+              <SlideMedia slide={tile.slide} alt={copy === 0 ? `@${tile.label}` : ""} sizes={`${TILE_W}px`} fit="object-contain object-top" />
               <span className="absolute left-2.5 top-2.5 whitespace-nowrap rounded-full bg-brand-navy/45 px-2.5 py-[5px] text-[13px] font-semibold text-white backdrop-blur-[6px]">
                 @{tile.label}
               </span>
@@ -497,14 +488,10 @@ function ProductCard() {
 
 /* ------------------------------------- Hero ------------------------------------ */
 
-// Lines + dots grid, white base. Only used behind the hero.
-const circuitBg =
-  "bg-white bg-[repeating-linear-gradient(0deg,transparent,transparent_19px,rgba(75,85,99,0.08)_19px,rgba(75,85,99,0.08)_20px,transparent_20px,transparent_39px,rgba(75,85,99,0.08)_39px,rgba(75,85,99,0.08)_40px),repeating-linear-gradient(90deg,transparent,transparent_19px,rgba(75,85,99,0.08)_19px,rgba(75,85,99,0.08)_20px,transparent_20px,transparent_39px,rgba(75,85,99,0.08)_39px,rgba(75,85,99,0.08)_40px),radial-gradient(circle_at_20px_20px,rgba(55,65,81,0.12)_2px,transparent_2px),radial-gradient(circle_at_40px_40px,rgba(55,65,81,0.12)_2px,transparent_2px)] bg-size-[40px_40px]";
-
 export default function HeroSection() {
   return (
     <section className="relative flex w-full flex-col overflow-hidden font-sauce text-brand-navy [--deck-top:0px] xl:block xl:h-[860px] xl:[--deck-top:104px]">
-      <div aria-hidden className={`pointer-events-none absolute inset-0 z-0 ${circuitBg}`} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-circuit" />
 
       {/* Copy */}
       <div className="relative z-20 order-1 flex flex-col items-start px-6 pt-10 xl:absolute xl:left-[max(1.5rem,calc(50%-640px))] xl:top-[388px] xl:-translate-y-1/2 xl:p-0">
@@ -516,15 +503,7 @@ export default function HeroSection() {
         <p className="mt-6 max-w-[312px] text-[20px] leading-[1.38] tracking-[-0.01em] text-slate-600">
           Strategy, short-form content and paid social that turn views into customers.
         </p>
-        <a
-          href="#contact"
-          className="group mt-5 inline-flex h-[55px] items-center gap-3.5 rounded-full bg-brand-navy pl-6 pr-2 text-[17px] font-medium tracking-[-0.02em] text-white shadow-[0_20px_40px_-18px_rgba(6,17,40,.75),inset_0_1px_0_rgba(255,255,255,.12)] transition-[translate,background-color] duration-300 hover:-translate-y-0.5 hover:bg-brand-navy-light"
-        >
-          Book a call
-          <span className="grid size-10 place-items-center rounded-full bg-white text-brand-navy transition-transform duration-300 group-hover:rotate-45">
-            <ArrowUpRight className="size-4" strokeWidth={2.5} />
-          </span>
-        </a>
+        <BookCallButton className="mt-5" />
       </div>
 
       {/* Deck + photo wall */}

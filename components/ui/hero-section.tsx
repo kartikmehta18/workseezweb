@@ -14,6 +14,7 @@ import Image from "next/image";
 import visualeezShot from "@/public/visualeez.png";
 import { useReducedMotion } from "motion/react";
 import { ArrowUpRight, Forward, Heart, MessageCircle } from "lucide-react";
+import BookCallButton from "@/components/ui/book-call-button";
 
 /* Brand colours live in app/globals.css (bg-brand-navy = #061128, …). */
 
@@ -497,14 +498,10 @@ function ProductCard() {
 
 /* ------------------------------------- Hero ------------------------------------ */
 
-// Lines + dots grid, white base. Only used behind the hero.
-const circuitBg =
-  "bg-white bg-[repeating-linear-gradient(0deg,transparent,transparent_19px,rgba(75,85,99,0.08)_19px,rgba(75,85,99,0.08)_20px,transparent_20px,transparent_39px,rgba(75,85,99,0.08)_39px,rgba(75,85,99,0.08)_40px),repeating-linear-gradient(90deg,transparent,transparent_19px,rgba(75,85,99,0.08)_19px,rgba(75,85,99,0.08)_20px,transparent_20px,transparent_39px,rgba(75,85,99,0.08)_39px,rgba(75,85,99,0.08)_40px),radial-gradient(circle_at_20px_20px,rgba(55,65,81,0.12)_2px,transparent_2px),radial-gradient(circle_at_40px_40px,rgba(55,65,81,0.12)_2px,transparent_2px)] bg-size-[40px_40px]";
-
 export default function HeroSection() {
   return (
     <section className="relative flex w-full flex-col overflow-hidden font-sauce text-brand-navy [--deck-top:0px] xl:block xl:h-[860px] xl:[--deck-top:104px]">
-      <div aria-hidden className={`pointer-events-none absolute inset-0 z-0 ${circuitBg}`} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-circuit" />
 
       {/* Copy */}
       <div className="relative z-20 order-1 flex flex-col items-start px-6 pt-10 xl:absolute xl:left-[max(1.5rem,calc(50%-640px))] xl:top-[388px] xl:-translate-y-1/2 xl:p-0">
@@ -516,15 +513,7 @@ export default function HeroSection() {
         <p className="mt-6 max-w-[312px] text-[20px] leading-[1.38] tracking-[-0.01em] text-slate-600">
           Strategy, short-form content and paid social that turn views into customers.
         </p>
-        <a
-          href="#contact"
-          className="group mt-5 inline-flex h-[55px] items-center gap-3.5 rounded-full bg-brand-navy pl-6 pr-2 text-[17px] font-medium tracking-[-0.02em] text-white shadow-[0_20px_40px_-18px_rgba(6,17,40,.75),inset_0_1px_0_rgba(255,255,255,.12)] transition-[translate,background-color] duration-300 hover:-translate-y-0.5 hover:bg-brand-navy-light"
-        >
-          Book a call
-          <span className="grid size-10 place-items-center rounded-full bg-white text-brand-navy transition-transform duration-300 group-hover:rotate-45">
-            <ArrowUpRight className="size-4" strokeWidth={2.5} />
-          </span>
-        </a>
+        <BookCallButton className="mt-5" />
       </div>
 
       {/* Deck + photo wall */}

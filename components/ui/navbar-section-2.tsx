@@ -2,6 +2,7 @@
 
 import { useState, type ComponentType } from "react";
 import Image, { type StaticImageData } from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import visualeezShot from "@/public/visualeez.png";
 import portalShot from "@/public/portal.png";
@@ -13,13 +14,11 @@ import {
   ChevronDown,
   Clapperboard,
   CodeXml,
-  ImageIcon,
   LayoutDashboard,
   Megaphone,
   Menu,
   PenLine,
   Share2,
-  Target,
   X,
 } from "lucide-react";
 
@@ -37,7 +36,7 @@ const accentBg: Record<Accent, string> = {
 
 type IconType = ComponentType<{ className?: string }>;
 
-type PanelId = "products" | "services" | "solutions";
+type PanelId = "products" | "solutions";
 
 type NavItem = {
   label: string;
@@ -68,12 +67,13 @@ type MenuPanel = {
 const PORTAL_URL = "https://portal.workseez.com/";
 const VISUALEEZ_URL = "https://visualeez.com";
 
+// Paths start with "/" so they also work from other pages (e.g. /contact).
 const navItems: NavItem[] = [
+  { label: "Home", href: "/" },
   { label: "Products", panelId: "products" },
-  { label: "Services", panelId: "services" },
-  { label: "Solutions", panelId: "solutions" },
-  { label: "About", href: "#about" },
-  // { label: "Contact", href: "#contact" },
+  { label: "Work", href: "/#results" },
+  { label: "Services", panelId: "solutions" },
+  { label: "About", href: "/#comparison" },
 ];
 
 const menuPanels: MenuPanel[] = [
@@ -86,24 +86,15 @@ const menuPanels: MenuPanel[] = [
     ],
   },
   {
-    id: "services",
-    height: 232,
-    items: [
-      { title: "Posts", description: "Posts and carousels designed for your social pages.", href: "#services", icon: ImageIcon, accent: "red" },
-      { title: "Video Editing", description: "Reels, ads and YouTube videos, edited and ready to post.", href: "#services", icon: Clapperboard, accent: "blue" },
-      { title: "Lead Generation", description: "Campaigns that bring in enquiries from real customers.", href: "#services", icon: Target, accent: "green" },
-    ],
-  },
-  {
     id: "solutions",
     height: 250,
     items: [
-      { title: "Digital Marketing", description: "Ads, SEO and campaigns", href: "#solutions", icon: Megaphone, accent: "red" },
-      { title: "Web & Software Dev", description: "Websites, apps and software", href: "#solutions", icon: CodeXml, accent: "blue" },
-      { title: "Video Editing", description: "Reels, ads and YouTube", href: "#solutions", icon: Clapperboard, accent: "green" },
-      { title: "AI Automation", description: "Automate repetitive work", href: "#solutions", icon: Bot, accent: "magenta" },
-      { title: "Content Creation", description: "Writing, design and scripts", href: "#solutions", icon: PenLine, accent: "red" },
-      { title: "Social Media", description: "Page management and posting", href: "#solutions", icon: Share2, accent: "blue" },
+      // All open the Services section on the home page.
+      { title: "Digital Marketing", description: "Ads, SEO and campaigns", href: "/#services", icon: Megaphone, accent: "red" },
+      { title: "Web & Software Dev", description: "Websites, apps and software", href: "/#services", icon: CodeXml, accent: "blue" },
+      { title: "Video Editing", description: "Reels, ads and YouTube", href: "/#services", icon: Clapperboard, accent: "green" },
+      { title: "Content Creation", description: "Writing, design and scripts", href: "/#services", icon: PenLine, accent: "red" },
+      { title: "Social Media", description: "Page management and posting", href: "/#services", icon: Share2, accent: "blue" },
     ],
   },
 ];
@@ -219,10 +210,10 @@ export default function NavbarTwo() {
     <div className="relative z-40 flex w-full select-none flex-col items-center px-6 pt-0 font-sans text-zinc-900">
       {/* Desktop */}
       <div className="relative z-30 hidden h-12 w-full max-w-7xl items-center justify-between lg:flex">
-        <a href="#" className="flex items-center" aria-label="Workseez home">
+        <Link href="/" className="flex items-center" aria-label="Workseez home">
           <span className="xl:hidden"><WorkseezLogo /></span>
           <span className="hidden xl:inline"><WorkseezLogo showWordmark /></span>
-        </a>
+        </Link>
 
         <div className="absolute left-1/2 top-0 hidden w-[700px] -translate-x-1/2 lg:block" style={{ filter: "drop-shadow(0 10px 16px rgba(6, 17, 40, 0.16))" }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="pointer-events-none absolute -left-[18px] top-0 z-10 text-brand-navy"><path d="M 20 20 L 20 0 L 0 0 C 11.046 0 20 11.046 20 20 Z" fill="currentColor" /></svg>
@@ -249,12 +240,12 @@ export default function NavbarTwo() {
           </motion.div>
         </div>
 
-        <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 rounded-lg bg-brand-navy px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-brand-navy-light">Contact<ArrowUpRight className="h-3.5 w-3.5" /></a>
+        <Link href="/contact" className="flex items-center gap-1 rounded-lg bg-brand-navy px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-brand-navy-light">Contact<ArrowUpRight className="h-3.5 w-3.5" /></Link>
       </div>
 
       {/* Mobile */}
       <div className="relative z-30 flex h-14 w-full items-center justify-between lg:hidden">
-        <a href="#" aria-label="Workseez home"><WorkseezLogo showWordmark /></a>
+        <Link href="/" aria-label="Workseez home"><WorkseezLogo showWordmark /></Link>
         <div className="flex items-center gap-2">
           <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-1 rounded-lg bg-brand-navy px-3 py-1.5 text-xs font-medium text-white sm:flex">Client Portal<ArrowUpRight className="h-3 w-3" /></a>
           <button type="button" aria-label={mobileOpen ? "Close menu" : "Open menu"} aria-expanded={mobileOpen} onClick={() => setMobileOpen((open) => !open)} className="grid size-9 place-items-center rounded-lg border border-zinc-200 text-brand-navy">{mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}</button>
@@ -308,7 +299,8 @@ export default function NavbarTwo() {
                   </div>
                 );
               })}
-              <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-white px-3 py-2 text-sm font-medium text-brand-navy sm:hidden">Client Portal<ArrowUpRight className="size-3.5" /></a>
+              <Link href="/contact" onClick={() => setMobileOpen(false)} className="mt-2 flex items-center justify-center gap-1 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-brand-navy">Contact / Book a call<ArrowUpRight className="size-3.5" /></Link>
+              <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1 rounded-lg border border-white/20 px-3 py-2 text-sm font-medium text-white sm:hidden">Client Portal<ArrowUpRight className="size-3.5" /></a>
             </div>
           </motion.div>
         )}

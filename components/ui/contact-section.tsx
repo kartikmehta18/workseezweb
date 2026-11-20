@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight, CircleCheck, Clock, Globe, Video } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-/* Contact / Book a call — one booking panel: navy call details on the left, Cal.com calendar on the right. */
+/* Contact / Book a call — short header, full-width Cal.com calendar, agenda row. */
 
 /**
  * Cal.com event: "username/event-slug" (a full https://cal.com/... URL also works).
@@ -16,11 +15,6 @@ const CAL_LINK = (process.env.NEXT_PUBLIC_CAL_LINK || "workseezcrm-uqox53/30min"
 const CAL_NAMESPACE = "workseez-call";
 const PORTAL_URL = "https://portal.workseez.com/";
 
-const details = [
-  { icon: Clock, label: "30 minutes" },
-  { icon: Video, label: "Cal Video — link sent with your invite" },
-  { icon: Globe, label: "Times shown in your timezone" },
-];
 
 const agenda = ["Your goals, audience and where you are today", "What's working on your socials, and what isn't", "A clear plan and the right package for you"];
 
@@ -35,8 +29,8 @@ function BookingCalendar() {
           light: { "cal-brand": "#061128", "cal-border-booker": "transparent", "cal-border-booker-width": "0px" },
           dark: { "cal-brand": "#ffffff" },
         },
-        // Call details live in our navy panel, so Cal shows just the calendar and times.
-        hideEventTypeDetails: true,
+        // Keep Cal's details column: with it, Cal uses its compact desktop layout (details · calendar · times).
+        hideEventTypeDetails: false,
         layout: "month_view",
       });
     })();
@@ -53,43 +47,22 @@ function BookingCalendar() {
   );
 }
 
-function CallDetails() {
+function Agenda() {
   return (
-    <div className="flex h-full flex-col rounded-[22px] bg-brand-navy p-7 text-white">
-      <div className="flex items-center gap-2.5">
-        <Image src="/logo.jpeg" alt="" width={36} height={36} className="size-9 rounded-full ring-1 ring-white/20" />
-        <span className="text-[15px] font-semibold text-slate-300">Workseez</span>
-      </div>
-      <h2 className="mt-5 text-[26px] font-semibold leading-[1.15] tracking-[-0.03em]">Free strategy call</h2>
-
-      <ul className="mt-5 space-y-3">
-        {details.map(({ icon: Icon, label }) => (
-          <li key={label} className="flex items-center gap-3 text-[15px] text-slate-200">
-            <Icon className="size-[18px] flex-none text-slate-400" />
-            {label}
-          </li>
-        ))}
-      </ul>
-
-      <div className="my-6 h-px bg-white/10" />
-
-      <p className="text-[13px] font-semibold uppercase tracking-[0.08em] text-slate-400">What we&rsquo;ll cover</p>
-      <ul className="mt-3 space-y-2.5">
-        {agenda.map((item) => (
-          <li key={item} className="flex gap-2.5 text-[15px] leading-[1.45] text-slate-200">
-            <CircleCheck className="mt-0.5 size-4 flex-none fill-brand-red text-brand-navy" />
-            {item}
-          </li>
-        ))}
-      </ul>
-
+    <div className="mx-auto mt-6 grid max-w-[1120px] gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+      {agenda.map((item, i) => (
+        <div key={item} className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3.5 ring-1 ring-slate-200/80">
+          <span className="grid size-8 flex-none place-items-center rounded-full bg-brand-navy text-[12px] font-semibold text-white">0{i + 1}</span>
+          <span className="text-[14px] leading-[1.35] text-slate-600">{item}</span>
+        </div>
+      ))}
       <a
         href={PORTAL_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="group mt-auto inline-flex items-center gap-1.5 pt-8 text-[14px] font-medium text-slate-300 transition-colors hover:text-white"
+        className="group flex items-center justify-center gap-1.5 rounded-2xl bg-brand-navy px-5 py-3.5 text-[14px] font-semibold text-white transition-colors hover:bg-brand-navy-light"
       >
-        Already a client? Go to the Client Portal
+        Client Portal
         <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
       </a>
     </div>
@@ -122,14 +95,15 @@ export default function ContactSection() {
         </p>
       </motion.div>
 
+      {/* Full width so Cal.com uses its compact desktop layout. */}
       <motion.div
         {...rise(0.12)}
-        className="relative mx-auto mt-10 grid max-w-[1120px] gap-2 rounded-[28px] bg-white p-2 shadow-[0_30px_70px_-40px_rgba(6,17,40,.45)] ring-1 ring-slate-200/80 lg:grid-cols-[340px_1fr]"
+        className="relative mx-auto mt-10 max-w-[1120px] rounded-[28px] bg-white p-2 shadow-[0_30px_70px_-40px_rgba(6,17,40,.45)] ring-1 ring-slate-200/80"
       >
-        <CallDetails />
-        <div className="min-w-0 rounded-[22px] bg-white">
-          <BookingCalendar />
-        </div>
+        <BookingCalendar />
+      </motion.div>
+      <motion.div {...rise(0.2)} className="relative">
+        <Agenda />
       </motion.div>
     </section>
   );

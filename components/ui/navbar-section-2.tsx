@@ -9,7 +9,6 @@ import portalShot from "@/public/portal.png";
 import {
   ArrowRight,
   ArrowUpRight,
-  Bot,
   ChartColumn,
   ChevronDown,
   Clapperboard,
@@ -226,14 +225,16 @@ export default function NavbarTwo() {
                   <button key={item.label} type="button" aria-expanded={activeMenu === item.panelId} onClick={() => toggleMenu(item.panelId!)} className={`flex cursor-pointer items-center gap-1 rounded-md px-3 py-1 outline-none transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-white/30 ${activeMenu === item.panelId ? "bg-brand-navy-light text-white" : "text-slate-300"}`}>
                     {item.label}<ChevronDown className={`h-3.5 w-3.5 opacity-70 transition-transform duration-200 ${activeMenu === item.panelId ? "rotate-180" : ""}`} />
                   </button>
-                ) : <a key={item.label} href={item.href} className="px-2 py-1 text-slate-300 transition-colors hover:text-white">{item.label}</a>)}
+                ) : <Link key={item.label} href={item.href ?? "/"} onClick={() => setActiveMenu(null)} className="px-2 py-1 text-slate-300 transition-colors hover:text-white">{item.label}</Link>)}
               </nav>
             </div>
 
             <AnimatePresence mode="wait">
               {activePanel && (
                 <motion.div key={activePanel.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="overflow-hidden border-t border-brand-navy-line bg-brand-navy">
-                  <DropdownPanel panel={activePanel} />
+                  <div onClick={(e) => (e.target as HTMLElement).closest("a") && setActiveMenu(null)}>
+                    <DropdownPanel panel={activePanel} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -261,7 +262,7 @@ export default function NavbarTwo() {
                 const isOpen = mobileActiveMenu === item.panelId;
 
                 if (!item.panelId) {
-                  return <a key={item.label} href={item.href || "#"} className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white">{item.label}</a>;
+                  return <Link key={item.label} href={item.href ?? "/"} onClick={() => setMobileOpen(false)} className="flex items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white">{item.label}</Link>;
                 }
 
                 return (
@@ -275,7 +276,7 @@ export default function NavbarTwo() {
                         <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
                           <div className="mx-3 mb-2 grid gap-1 border-l border-white/10 pl-3 pt-1">
                             {panel.items.map((panelItem) => (
-                              <a key={panelItem.title} {...linkProps(panelItem)} className={`flex gap-3 rounded-md px-3 py-2 hover:bg-white/5 ${panelItem.image ? "items-center" : "items-start"}`}>
+                              <a key={panelItem.title} {...linkProps(panelItem)} onClick={() => setMobileOpen(false)} className={`flex gap-3 rounded-md px-3 py-2 hover:bg-white/5 ${panelItem.image ? "items-center" : "items-start"}`}>
                                 {panelItem.image ? (
                                   <span className="relative h-10 w-[72px] shrink-0 overflow-hidden rounded bg-white ring-1 ring-white/10">
                                     <Image src={panelItem.image} alt="" fill sizes="72px" placeholder="blur" className="object-cover object-top" />

@@ -1,21 +1,20 @@
 "use client";
 
-import { useEffect, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion, useSpring } from "motion/react";
+import { AnimatePresence, motion, useInView, useReducedMotion, useSpring } from "motion/react";
 import { BadgeCheck, Heart, MessageCircle, Send } from "lucide-react";
 import BookCallButton from "@/components/ui/book-call-button";
+import { SlideMedia, slides } from "@/components/ui/slide-media";
 
 /* "We focus on results" — copy on the left, a phone that swipes through reels on the right. */
 
-const slide = (file: string) => `/heroslide/${encodeURIComponent(file)}`;
-
 // Same post samples as the hero, so the browser already has them cached.
 const reels = [
-  { src: slide("Denis_Panjuta_10_MCP_Concepts_1080x1350.gif"), caption: "10 MCP concepts every AI builder should know", likes: "612K", comments: "8.4K" },
-  { src: slide("AI_Agent_vs_Agentic_AI_Cartoon_1080x1350_light (v1).gif"), caption: "AI agent vs agentic AI, explained in one cartoon", likes: "318K", comments: "3.1K" },
-  { src: slide("Denis_Panjuta_How_AI_Chatbot_Is_Made_Animated_1080x1350.gif"), caption: "How an AI chatbot is made, start to finish", likes: "204K", comments: "2.6K" },
-  { src: slide("Denis_Panjuta_Claude_Code_Agent_Repos_1080x1350.gif"), caption: "10 best AI agent repositories for Claude Code", likes: "530K", comments: "7.7K" },
+  { slide: slides.mcp, caption: "10 MCP concepts every AI builder should know", likes: "612K", comments: "8.4K" },
+  { slide: slides.aiAgents, caption: "AI agent vs agentic AI, explained in one cartoon", likes: "318K", comments: "3.1K" },
+  { slide: slides.chatbot, caption: "How an AI chatbot is made, start to finish", likes: "204K", comments: "2.6K" },
+  { slide: slides.repos, caption: "10 best AI agent repositories for Claude Code", likes: "530K", comments: "7.7K" },
 ];
 
 const SWIPE_MS = 2800;
@@ -49,13 +48,13 @@ function StatusBar() {
   );
 }
 
-function Reel({ reel }: { reel: (typeof reels)[number] }) {
+function Reel({ reel, play }: { reel: (typeof reels)[number]; play: boolean }) {
   return (
     <>
       {/* Blurred copy fills the tall screen; the 4:5 post sits sharp on top, like Reels does. */}
-      <Image src={reel.src} alt="" fill sizes="280px" unoptimized aria-hidden className="scale-125 object-cover opacity-70 blur-2xl" />
+      <Image src={reel.slide.poster} alt="" fill sizes="96px" aria-hidden className="scale-125 object-cover opacity-70 blur-2xl" />
       <div className="absolute inset-0 bg-brand-navy/35" />
-      <Image src={reel.src} alt={reel.caption} fill sizes="280px" unoptimized className="object-contain object-[50%_44%]" />
+      <SlideMedia slide={reel.slide} alt={reel.caption} play={play} sizes="280px" fit="object-contain object-[50%_44%]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.45)_0%,rgba(0,0,0,0)_16%,rgba(0,0,0,0)_60%,rgba(0,0,0,.8)_100%)]" />
 
       <div className="absolute bottom-6 left-4 right-14 text-white">
@@ -82,7 +81,7 @@ function Reel({ reel }: { reel: (typeof reels)[number] }) {
   );
 }
 
-function PhoneScreen({ index }: { index: number }) {
+function PhoneScreen({ index, play }: { index: number; play: boolean }) {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[42px] bg-brand-navy">
       {/* Each reel slides up from below as the previous one leaves through the top. */}
@@ -95,7 +94,7 @@ function PhoneScreen({ index }: { index: number }) {
           exit={{ y: "-100%", scale: 0.96 }}
           transition={{ duration: 0.8, ease: [0.65, 0, 0.35, 1] }}
         >
-          <Reel reel={reels[index]} />
+          <Reel reel={reels[index]} play={play} />
         </motion.div>
       </AnimatePresence>
 
@@ -113,18 +112,21 @@ function PhoneScreen({ index }: { index: number }) {
 function PhoneMockup() {
   const reduceMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
+  // Only play video and swipe reels while the phone is on screen.
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: "200px 0px" });
 
   // Cursor tilt: the phone leans toward the pointer, smoothed with a spring.
   const tiltX = useSpring(0, { stiffness: 120, damping: 18 });
   const tiltY = useSpring(0, { stiffness: 120, damping: 18 });
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion || !inView) return;
     const id = setInterval(() => {
       if (!document.hidden) setIndex((i) => (i + 1) % reels.length);
     }, SWIPE_MS);
     return () => clearInterval(id);
-  }, [reduceMotion]);
+  }, [reduceMotion, inView]);
 
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (reduceMotion || e.pointerType === "touch") return;
@@ -139,6 +141,7 @@ function PhoneMockup() {
 
   return (
     <div
+      ref={ref}
       className="relative grid h-[680px] w-[420px] flex-none place-items-center [perspective:1400px]"
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
@@ -168,7 +171,7 @@ function PhoneMockup() {
         {/* Titanium frame, black bezel, screen */}
         <div className="h-full w-full rounded-[54px] bg-[linear-gradient(145deg,#4a505c_0%,#1b1e25_30%,#30343d_62%,#121419_100%)] p-[3px] shadow-[0_50px_90px_-30px_rgba(6,17,40,.55),0_20px_40px_-20px_rgba(6,17,40,.35)]">
           <div className="h-full w-full rounded-[51px] bg-black p-[9px]">
-            <PhoneScreen index={index} />
+            <PhoneScreen index={index} play={inView} />
           </div>
         </div>
       </motion.div>

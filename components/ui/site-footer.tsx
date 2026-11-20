@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import { ArrowUp } from "lucide-react";
+import { useLenis } from "lenis/react";
 import BookCallButton from "@/components/ui/book-call-button";
 
 /* Navy footer: intro + link columns, giant wordmark, copyright bar. */
@@ -84,7 +85,9 @@ export default function SiteFooter() {
   const reduceMotion = useReducedMotion();
   const year = useYear();
 
-  const backToTop = () => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  const lenis = useLenis();
+  // Glide up with Lenis (instant when reduced motion is on); fall back to native scrolling.
+  const backToTop = () => (lenis ? lenis.scrollTo(0) : window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" }));
 
   return (
     <footer className="w-full overflow-hidden bg-brand-navy font-sauce text-white">

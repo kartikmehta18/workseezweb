@@ -15,11 +15,9 @@ import visualeezShot from "@/public/visualeez.png";
 import { useReducedMotion } from "motion/react";
 import { ArrowUpRight, Forward, Heart, MessageCircle } from "lucide-react";
 import BookCallButton from "@/components/ui/book-call-button";
+import { SlideMedia, slides, type Slide } from "@/components/ui/slide-media";
 
 /* Brand colours live in app/globals.css (bg-brand-navy = #061128, …). */
-
-/** Animated post samples (1080×1350) in public/heroslide. */
-const slide = (file: string) => `/heroslide/${encodeURIComponent(file)}`;
 
 /** 5140000 → "5.1M", 612000 → "612K". */
 function compact(n: number) {
@@ -31,7 +29,7 @@ function compact(n: number) {
 type Post = {
   handle: string;
   platform: string;
-  src: string;
+  slide: Slide;
   caption: string;
   tags: string;
   views: number;
@@ -42,17 +40,17 @@ type Post = {
 
 // Sample work. Swap the numbers for real campaign results when you have them.
 const posts: Post[] = [
-  { handle: "workseez", platform: "LinkedIn", src: slide("AI_Agent_vs_Agentic_AI_Cartoon_1080x1350_light (v1).gif"), caption: "AI agent vs agentic AI, explained in one cartoon", tags: "#ai #agents", views: 2_410_000, likes: 318_000, comments: 3_100, shares: 12_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_Panjuta_10_MCP_Concepts_1080x1350.gif"), caption: "10 MCP concepts every AI builder should know", tags: "#mcp #aitools", views: 5_140_000, likes: 612_000, comments: 8_400, shares: 41_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_AgenticAIGovernance_Animated_1080x1350.gif"), caption: "Deploying AI agents safely: the terms to know", tags: "#aigovernance #agenticai", views: 3_620_000, likes: 441_000, comments: 5_200, shares: 26_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_Panjuta_Claude_Code_Agent_Repos_1080x1350.gif"), caption: "10 best AI agent repositories for Claude Code", tags: "#claudecode #github", views: 4_230_000, likes: 530_000, comments: 7_700, shares: 33_000 },
-  { handle: "workseez", platform: "LinkedIn", src: slide("Denis_Panjuta_How_AI_Chatbot_Is_Made_Animated_1080x1350.gif"), caption: "How an AI chatbot is made, start to finish", tags: "#llm #chatbots", views: 1_840_000, likes: 204_000, comments: 2_600, shares: 9_100 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.aiAgents, caption: "AI agent vs agentic AI, explained in one cartoon", tags: "#ai #agents", views: 2_410_000, likes: 318_000, comments: 3_100, shares: 12_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.mcp, caption: "10 MCP concepts every AI builder should know", tags: "#mcp #aitools", views: 5_140_000, likes: 612_000, comments: 8_400, shares: 41_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.governance, caption: "Deploying AI agents safely: the terms to know", tags: "#aigovernance #agenticai", views: 3_620_000, likes: 441_000, comments: 5_200, shares: 26_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.repos, caption: "10 best AI agent repositories for Claude Code", tags: "#claudecode #github", views: 4_230_000, likes: 530_000, comments: 7_700, shares: 33_000 },
+  { handle: "workseez", platform: "LinkedIn", slide: slides.chatbot, caption: "How an AI chatbot is made, start to finish", tags: "#llm #chatbots", views: 1_840_000, likes: 204_000, comments: 2_600, shares: 9_100 },
 ];
 
-type Tile = { src: string; label: string };
+type Tile = { slide: Slide; label: string };
 
 const tileLabels = ["ai.agents", "mcp.concepts", "ai.governance", "claude.code", "ai.chatbots", "agentic.ai", "ai.tools", "llm.basics"];
-const initialTiles: Tile[] = tileLabels.map((label, i) => ({ src: posts[i % posts.length].src, label }));
+const initialTiles: Tile[] = tileLabels.map((label, i) => ({ slide: posts[i % posts.length].slide, label }));
 
 /* ------------------------------ Motion constants ------------------------------ */
 
@@ -137,16 +135,8 @@ function PostCard({
         boxShadow: `0 ${30 * K}px ${60 * K}px -${28 * K}px rgba(6,17,40,.55), 0 ${10 * K}px ${22 * K}px -${12 * K}px rgba(0,0,0,.35)`,
       }}
     >
-      <Image
-        src={post.src}
-        alt={post.caption}
-        fill
-        sizes={`${CARD_W}px`}
-        unoptimized
-        loading="eager"
-        draggable={false}
-        className="pointer-events-none select-none object-contain object-[50%_45%]"
-      />
+      {/* Only the front card plays video; cards behind it and the flying card show the still. */}
+      <SlideMedia slide={post.slide} alt={post.caption} play={active} sizes={`${CARD_W}px`} fit="object-contain object-[50%_45%]" priority={active} />
       <div ref={uiRef} className="absolute inset-0 text-white">
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,.38)_0%,rgba(0,0,0,0)_22%,rgba(0,0,0,0)_50%,rgba(0,0,0,.74)_100%)]" />
 
@@ -341,7 +331,7 @@ function SwipeStage({ className }: { className: string }) {
   );
 
   const land = useCallback((f: Flyer) => {
-    setTiles((list) => list.map((t, i) => (i === f.tile ? { src: f.post.src, label: f.post.handle } : t)));
+    setTiles((list) => list.map((t, i) => (i === f.tile ? { slide: f.post.slide, label: f.post.handle } : t)));
     setFlyers((list) => list.filter((x) => x.id !== f.id));
   }, []);
 
@@ -397,7 +387,7 @@ function SwipeStage({ className }: { className: string }) {
               className="relative flex-none overflow-hidden rounded-[22px] bg-white ring-1 ring-slate-200"
               style={{ width: TILE_W, height: TILE_H }}
             >
-              <Image src={tile.src} alt={copy === 0 ? `@${tile.label}` : ""} fill sizes={`${TILE_W}px`} unoptimized className="object-contain object-top" />
+              <SlideMedia slide={tile.slide} alt={copy === 0 ? `@${tile.label}` : ""} sizes={`${TILE_W}px`} fit="object-contain object-top" />
               <span className="absolute left-2.5 top-2.5 whitespace-nowrap rounded-full bg-brand-navy/45 px-2.5 py-[5px] text-[13px] font-semibold text-white backdrop-blur-[6px]">
                 @{tile.label}
               </span>

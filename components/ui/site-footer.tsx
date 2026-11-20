@@ -25,10 +25,10 @@ const columns: { title: string; links: FooterLink[] }[] = [
   },
   {
     title: "Follow",
-    // TODO: replace "#" with the real Workseez profile URLs.
+    // TODO: add the real X profile URL.
     links: [
-      { label: "Instagram", href: "#", external: true },
-      { label: "LinkedIn", href: "#", external: true },
+      { label: "Instagram", href: "https://www.instagram.com/workseez/", external: true },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/workseez", external: true },
       { label: "X", href: "#", external: true },
     ],
   },

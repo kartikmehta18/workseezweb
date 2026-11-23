@@ -3,6 +3,7 @@ import HeroSection from "@/components/ui/hero-section";
 import PlatformsSection from "@/components/ui/platforms-section";
 import ResultsSection from "@/components/ui/results-section";
 import ServicesSection from "@/components/ui/services-section";
+import ProcessSection from "@/components/ui/process-section";
 import ComparisonSection from "@/components/ui/comparison-section";
 import PricingSection from "@/components/ui/pricing-section";
 import FaqSection from "@/components/ui/faq-section";
@@ -16,6 +17,7 @@ export default function Home() {
       <PlatformsSection />
       <ResultsSection />
       <ServicesSection />
+      <ProcessSection />
       <ComparisonSection />
       <PricingSection />
       <FaqSection />

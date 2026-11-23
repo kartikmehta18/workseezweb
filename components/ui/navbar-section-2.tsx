@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType, type RefObject } from "react";
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -69,8 +69,8 @@ const VISUALEEZ_URL = "https://visualeez.com";
 // Paths start with "/" so they also work from other pages (e.g. /contact).
 const navItems: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Products", panelId: "products" },
   { label: "Work", href: "/#results" },
+  { label: "Products", panelId: "products" },
   { label: "Services", panelId: "solutions" },
   { label: "About", href: "/#comparison" },
 ];
@@ -197,11 +197,38 @@ function DropdownPanel({ panel }: { panel: MenuPanel }) {
 
 /* --------------------------------- Navbar ---------------------------------- */
 
+/** While `active`, calls `onClose` on a click/tap outside every ref, or on Escape. */
+function useDismiss(active: boolean, refs: RefObject<HTMLElement | null>[], onClose: () => void) {
+  useEffect(() => {
+    if (!active) return;
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node;
+      if (!refs.some((ref) => ref.current?.contains(target))) onClose();
+    };
+    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+    // refs are stable and onClose only sets state, so `active` is the only real dependency.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
+}
+
 export default function NavbarTwo() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileActiveMenu, setMobileActiveMenu] = useState<string | null>(null);
   const activePanel = getPanel(activeMenu);
+
+  const desktopMenuRef = useRef<HTMLDivElement>(null);
+  const mobileBarRef = useRef<HTMLDivElement>(null);
+  const mobilePanelRef = useRef<HTMLDivElement>(null);
+
+  useDismiss(activeMenu !== null, [desktopMenuRef], () => setActiveMenu(null));
+  useDismiss(mobileOpen, [mobileBarRef, mobilePanelRef], () => setMobileOpen(false));
 
   const toggleMenu = (menuName: string) => setActiveMenu(activeMenu === menuName ? null : menuName);
 
@@ -214,7 +241,7 @@ export default function NavbarTwo() {
           <span className="hidden xl:inline"><WorkseezLogo showWordmark /></span>
         </Link>
 
-        <div className="absolute left-1/2 top-0 hidden w-[700px] -translate-x-1/2 lg:block" style={{ filter: "drop-shadow(0 10px 16px rgba(6, 17, 40, 0.16))" }}>
+        <div ref={desktopMenuRef} className="absolute left-1/2 top-0 hidden w-[700px] -translate-x-1/2 lg:block" style={{ filter: "drop-shadow(0 10px 16px rgba(6, 17, 40, 0.16))" }}>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="pointer-events-none absolute -left-[18px] top-0 z-10 text-brand-navy"><path d="M 20 20 L 20 0 L 0 0 C 11.046 0 20 11.046 20 20 Z" fill="currentColor" /></svg>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="pointer-events-none absolute -right-[18px] top-0 z-10 text-brand-navy"><path d="M 0 0 L 20 0 C 8.954 0 0 8.954 0 20 Z" fill="currentColor" /></svg>
 
@@ -245,7 +272,7 @@ export default function NavbarTwo() {
       </div>
 
       {/* Mobile */}
-      <div className="relative z-30 flex h-14 w-full items-center justify-between lg:hidden">
+      <div ref={mobileBarRef} className="relative z-30 flex h-14 w-full items-center justify-between lg:hidden">
         <Link href="/" aria-label="Workseez home"><WorkseezLogo showWordmark /></Link>
         <div className="flex items-center gap-2">
           <a href={PORTAL_URL} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-1 rounded-lg bg-brand-navy px-3 py-1.5 text-xs font-medium text-white sm:flex">Client Portal<ArrowUpRight className="h-3 w-3" /></a>
@@ -255,7 +282,7 @@ export default function NavbarTwo() {
 
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="relative z-20 w-full overflow-hidden rounded-xl bg-brand-navy text-white lg:hidden">
+          <motion.div ref={mobilePanelRef} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="relative z-20 w-full overflow-hidden rounded-xl bg-brand-navy text-white lg:hidden">
             <div className="grid gap-1 p-4">
               {navItems.map((item) => {
                 const panel = item.panelId ? getPanel(item.panelId) : null;

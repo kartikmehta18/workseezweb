@@ -3,7 +3,8 @@
 import { useEffect } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { motion, useReducedMotion } from "motion/react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
+import SectionBadge from "@/components/ui/section-badge";
 
 /* Contact / Book a call — short header, full-width Cal.com calendar, agenda row. */
 
@@ -86,7 +87,7 @@ export default function ContactSection() {
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-[linear-gradient(180deg,#fff_0%,rgba(255,255,255,0)_20%,rgba(255,255,255,0)_50%,#fff_100%)]" />
 
       <motion.div {...rise()} className="relative flex flex-col items-center text-center">
-        <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-[14px] font-medium text-slate-600">Contact</span>
+        <SectionBadge icon={Mail}>Contact</SectionBadge>
         <h1 className="mt-5 text-[36px] font-semibold leading-[1.08] tracking-[-0.04em] md:text-[48px]">
           Let&rsquo;s Talk About Your <span className="text-brand-red">Growth</span>
         </h1>

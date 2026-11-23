@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
-import { CircleCheck, CircleX } from "lucide-react";
+import { CircleCheck, CircleX, Scale } from "lucide-react";
+import SectionBadge from "@/components/ui/section-badge";
 
 /* "Why choose Workseez" — generic agencies vs. us, side by side. */
 
@@ -24,7 +25,7 @@ export default function ComparisonSection() {
   return (
     <section id="comparison" className="w-full bg-white px-6 py-24 font-sauce text-brand-navy">
       <motion.div {...rise()} className="flex flex-col items-center text-center">
-        <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-[14px] font-medium text-slate-600">Comparison</span>
+        <SectionBadge icon={Scale}>Comparison</SectionBadge>
         <h2 className="mt-7 text-[36px] font-semibold leading-[1.1] tracking-[-0.04em] md:text-[48px]">
           Why Choose
           <br />

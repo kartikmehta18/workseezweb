@@ -3,6 +3,7 @@
 import { useRef, type ComponentType } from "react";
 import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { CircleCheck, Film } from "lucide-react";
+import SectionBadge from "@/components/ui/section-badge";
 import BookCallButton from "@/components/ui/book-call-button";
 
 /* "How we help you grow" — service cards that pin and stack as you scroll. */
@@ -260,10 +261,7 @@ export default function ServicesSection() {
   return (
     <section id="services" className="relative w-full bg-slate-50 px-6 py-24 font-sauce text-brand-navy">
       <motion.div {...rise} className="flex flex-col items-center text-center">
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[15px] font-medium text-slate-600">
-          <Film className="size-4" />
-          Services
-        </span>
+        <SectionBadge icon={Film}>Services</SectionBadge>
         <h2 className="mt-5 text-[38px] font-semibold leading-[1.05] tracking-[-0.04em] md:text-[56px]">How we help you grow</h2>
       </motion.div>
 

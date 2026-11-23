@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, useInView, useReducedMotion, useSpring } from "motion/react";
-import { BadgeCheck, Heart, MessageCircle, Send } from "lucide-react";
+import { BadgeCheck, Heart, MessageCircle, Send, TrendingUp } from "lucide-react";
+import SectionBadge from "@/components/ui/section-badge";
 import BookCallButton from "@/components/ui/book-call-button";
 import { SlideMedia, slides } from "@/components/ui/slide-media";
 
@@ -201,7 +202,7 @@ export default function ResultsSection() {
 
       <div className="relative mx-auto grid max-w-[1072px] items-center gap-10 md:grid-cols-[1fr_420px] md:gap-16">
         <motion.div {...rise()} className="flex flex-col items-start pb-6 md:pb-20">
-          <span className="rounded-lg border border-slate-200 bg-slate-100 px-3 py-2 text-[14px] font-medium text-slate-600">Ready To Grow?</span>
+          <SectionBadge icon={TrendingUp}>Ready To Grow?</SectionBadge>
           <h2 className="mt-7 max-w-[520px] text-[36px] font-semibold leading-[1.15] tracking-[-0.04em] md:text-[48px]">
             And We Focus On <span className="text-brand-red">Results</span> Your Audience Actually Responds To.
           </h2>
